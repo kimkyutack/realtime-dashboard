@@ -15,76 +15,100 @@ export interface Vehicle {
   history?: { lat: number; lng: number; timestamp: string }[];
 }
 
+export type VehicleGeoJson = {
+  type: "FeatureCollection";
+  features: Array<{
+    type: "Feature";
+    geometry: {
+      type: "Point";
+      coordinates: [number, number];
+    };
+    properties: {
+      id: string;
+      name: string;
+      type: "트럭" | "버스" | "승용차";
+      status: "활성" | "대기" | "정비";
+      speed: number;
+      lastUpdate: string;
+      route?: string;
+      history?: Array<{ lat: number; lng: number; timestamp: string }>;
+    };
+  }>;
+};
+
 interface VehicleStore {
-  vehicles: Vehicle[];
-  selectedVehicle: Vehicle | null;
+  vehicles: VehicleGeoJson;
+  selectedVehicleId: string | null;
   isLoading: boolean;
   error: string | null;
   isAdmin: boolean;
 
-  setVehicles: (vehicles: Vehicle[]) => void;
-  updateVehicle: (id: string, updates: Partial<Vehicle>) => void;
-  selectVehicle: (vehicle: Vehicle | null) => void;
+  setVehicles: (vehicles: VehicleGeoJson) => void;
+  addVehicle: (feature: VehicleGeoJson["features"][0]) => void;
+  updateVehicle: (
+    id: string,
+    updates: Partial<VehicleGeoJson["features"][0]["properties"]>
+  ) => void;
+  removeVehicle: (id: string) => void;
+  selectVehicle: (id: string | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  addVehicle: (vehicle: Vehicle) => void;
-  removeVehicle: (id: string) => void;
   toggleAdmin: () => void;
 
-  getActiveVehicles: () => Vehicle[];
-  getVehicleById: (id: string) => Vehicle | undefined;
-  getVehiclesByType: (type: Vehicle["type"]) => Vehicle[];
+  getVehicleById: (id: string) => VehicleGeoJson["features"][0] | undefined;
 }
 
+const emptyGeoJson: VehicleGeoJson = {
+  type: "FeatureCollection",
+  features: [],
+};
+
 export const useVehicleStore = create<VehicleStore>((set, get) => ({
-  vehicles: [],
-  selectedVehicle: null,
+  vehicles: emptyGeoJson,
+  selectedVehicleId: null,
   isLoading: false,
   error: null,
   isAdmin: false,
 
   setVehicles: (vehicles) => set({ vehicles }),
 
-  updateVehicle: (id, updates) =>
+  addVehicle: (feature) =>
     set((state) => ({
-      vehicles: state.vehicles.map((vehicle) => {
-        if (vehicle.id !== id) return vehicle;
-        let newHistory = vehicle.history || [];
-        if (
-          updates.position &&
-          (vehicle.position.lat !== updates.position.lat ||
-            vehicle.position.lng !== updates.position.lng)
-        ) {
-          newHistory = [
-            ...newHistory,
-            {
-              lat: updates.position.lat,
-              lng: updates.position.lng,
-              timestamp: updates.lastUpdate || new Date().toISOString(),
-            },
-          ];
-        }
-        return { ...vehicle, ...updates, history: newHistory };
-      }),
+      vehicles: {
+        ...state.vehicles,
+        features: [...state.vehicles.features, feature],
+      },
     })),
 
-  selectVehicle: (vehicle) => set({ selectedVehicle: vehicle }),
-
-  setLoading: (isLoading) => set({ isLoading }),
-
-  setError: (error) => set({ error }),
-
-  addVehicle: (vehicle) =>
-    set((state) => ({ vehicles: [...state.vehicles, vehicle] })),
+  updateVehicle: (id, updates) =>
+    set((state) => ({
+      vehicles: {
+        ...state.vehicles,
+        features: state.vehicles.features.map((f) =>
+          f.properties.id === id
+            ? {
+                ...f,
+                properties: { ...f.properties, ...updates },
+              }
+            : f
+        ),
+      },
+    })),
 
   removeVehicle: (id) =>
-    set((state) => ({ vehicles: state.vehicles.filter((v) => v.id !== id) })),
+    set((state) => ({
+      vehicles: {
+        ...state.vehicles,
+        features: state.vehicles.features.filter((f) => f.properties.id !== id),
+      },
+    })),
 
+  selectVehicle: (id) => set({ selectedVehicleId: id }),
+
+  setLoading: (isLoading) => set({ isLoading }),
+  setError: (error) => set({ error }),
   toggleAdmin: () => set((state) => ({ isAdmin: !state.isAdmin })),
 
-  getActiveVehicles: () => get().vehicles.filter((v) => v.status === "활성"),
-
-  getVehicleById: (id) => get().vehicles.find((v) => v.id === id),
-
-  getVehiclesByType: (type) => get().vehicles.filter((v) => v.type === type),
+  getVehicleById: (id) =>
+    get().vehicles.features.find((f) => f.properties.id === id),
 }));

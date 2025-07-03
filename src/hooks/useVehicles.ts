@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { vehicleApi } from "../services/vehicleApi";
 import { useVehicleStore } from "../store/vehicleStore";
@@ -13,7 +13,7 @@ export const useVehicles = () => {
     refetchInterval: 30000,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (query.data) {
       setVehicles(query.data);
       setLoading(false);
@@ -21,14 +21,14 @@ export const useVehicles = () => {
     }
   }, [query.data, setVehicles, setLoading, setError]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (query.error) {
       setError((query.error as Error).message);
       setLoading(false);
     }
   }, [query.error, setError, setLoading]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLoading(query.isLoading);
   }, [query.isLoading, setLoading]);
 

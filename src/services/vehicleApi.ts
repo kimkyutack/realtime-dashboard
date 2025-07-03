@@ -1,18 +1,13 @@
 import axios from "axios";
-import { Vehicle } from "../store/vehicleStore";
+import { Vehicle, VehicleGeoJson } from "../store/vehicleStore";
 import { generateDummyVehicles } from "../utils/vehicleSimulator";
 
 const API_BASE_URL = "https://api.example.com";
 
 export const vehicleApi = {
-  getVehicles: async (): Promise<Vehicle[]> => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/vehicles`);
-      return response.data;
-    } catch (error) {
-      console.error("차량 데이터 가져오기 실패:", error);
-      return getMockVehicles();
-    }
+  getVehicles: async (): Promise<VehicleGeoJson> => {
+    // 실제 API라면 fetch/axios로 GeoJSON을 받아오면 됨
+    return getMockVehicles();
   },
 
   getVehicle: async (id: string): Promise<Vehicle> => {
@@ -39,6 +34,52 @@ export const vehicleApi = {
   },
 };
 
-function getMockVehicles(): Vehicle[] {
-  return generateDummyVehicles(15);
+function getMockVehicles(): VehicleGeoJson {
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [126.978, 37.5665] },
+        properties: {
+          id: "1",
+          name: "트럭-001",
+          type: "트럭",
+          status: "활성",
+          speed: 45,
+          lastUpdate: new Date().toISOString(),
+          route: "서울-부산",
+          history: [],
+        },
+      },
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [129.0756, 35.1796] },
+        properties: {
+          id: "2",
+          name: "버스-001",
+          type: "버스",
+          status: "활성",
+          speed: 30,
+          lastUpdate: new Date().toISOString(),
+          route: "부산시내순환",
+          history: [],
+        },
+      },
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [126.7052, 37.4563] },
+        properties: {
+          id: "3",
+          name: "승용차-001",
+          type: "승용차",
+          status: "대기",
+          speed: 0,
+          lastUpdate: new Date().toISOString(),
+          route: "인천-서울",
+          history: [],
+        },
+      },
+    ],
+  };
 }

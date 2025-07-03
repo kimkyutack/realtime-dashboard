@@ -1,15 +1,15 @@
 import React from "react";
-import { Vehicle } from "../store/vehicleStore";
+import { VehicleGeoJson } from "../store/vehicleStore";
 
 interface VehicleListProps {
-  vehicles: Vehicle[];
-  selectedVehicle: Vehicle | null;
-  onVehicleSelect: (vehicle: Vehicle) => void;
+  vehicles: VehicleGeoJson["features"];
+  selectedVehicle: VehicleGeoJson["features"][0] | undefined;
+  onVehicleSelect: (vehicle: VehicleGeoJson["features"][0]) => void;
   onFilterChange: (filter: string) => void;
   filter: string;
 }
 
-const getStatusColor = (status: Vehicle["status"]) => {
+const getStatusColor = (status: string) => {
   switch (status) {
     case "활성":
       return "bg-green-100 text-green-800";
@@ -22,7 +22,7 @@ const getStatusColor = (status: Vehicle["status"]) => {
   }
 };
 
-const getTypeIcon = (type: Vehicle["type"]) => {
+const getTypeIcon = (type: string) => {
   switch (type) {
     case "트럭":
       return "🚛";
@@ -42,12 +42,14 @@ export const VehicleList: React.FC<VehicleListProps> = ({
   onFilterChange,
   filter,
 }) => {
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      vehicle.name.toLowerCase().includes(filter.toLowerCase()) ||
-      vehicle.type.toLowerCase().includes(filter.toLowerCase()) ||
-      vehicle.status.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredVehicles = vehicles.filter((feature) => {
+    const v = feature.properties;
+    return (
+      v.name.toLowerCase().includes(filter.toLowerCase()) ||
+      v.type.toLowerCase().includes(filter.toLowerCase()) ||
+      v.status.toLowerCase().includes(filter.toLowerCase())
+    );
+  });
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
@@ -68,53 +70,50 @@ export const VehicleList: React.FC<VehicleListProps> = ({
             검색 결과가 없습니다.
           </p>
         ) : (
-          filteredVehicles.map((vehicle) => (
-            <div
-              key={vehicle.id}
-              className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                selectedVehicle?.id === vehicle.id
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-              }`}
-              onClick={() => onVehicleSelect(vehicle)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">{getTypeIcon(vehicle.type)}</span>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">
-                      {vehicle.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 capitalize">
-                      {vehicle.type} • {vehicle.status}
-                    </p>
+          filteredVehicles.map((feature) => {
+            const v = feature.properties;
+            return (
+              <div
+                key={v.id}
+                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                  selectedVehicle?.properties.id === v.id
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                }`}
+                onClick={() => onVehicleSelect(feature)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{getTypeIcon(v.type)}</span>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{v.name}</h3>
+                      <p className="text-sm text-gray-600 capitalize">
+                        {v.type} • {v.status}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        v.status
+                      )}`}
+                    >
+                      {v.status}
+                    </span>
+                    <p className="text-sm text-gray-600 mt-1">{v.speed} km/h</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      vehicle.status
-                    )}`}
-                  >
-                    {vehicle.status}
-                  </span>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {vehicle.speed} km/h
-                  </p>
-                </div>
-              </div>
 
-              {vehicle.route && (
-                <p className="text-xs text-gray-500 mt-2">
-                  경로: {vehicle.route}
+                {v.route && (
+                  <p className="text-xs text-gray-500 mt-2">경로: {v.route}</p>
+                )}
+
+                <p className="text-xs text-gray-400 mt-1">
+                  {new Date(v.lastUpdate).toLocaleString()}
                 </p>
-              )}
-
-              <p className="text-xs text-gray-400 mt-1">
-                {new Date(vehicle.lastUpdate).toLocaleString()}
-              </p>
-            </div>
-          ))
+              </div>
+            );
+          })
         )}
       </div>
 
@@ -122,7 +121,8 @@ export const VehicleList: React.FC<VehicleListProps> = ({
         <div className="flex justify-between text-sm text-gray-600">
           <span>총 차량: {vehicles.length}대</span>
           <span>
-            활성: {vehicles.filter((v) => v.status === "활성").length}대
+            활성:{" "}
+            {vehicles.filter((f) => f.properties.status === "활성").length}대
           </span>
         </div>
       </div>

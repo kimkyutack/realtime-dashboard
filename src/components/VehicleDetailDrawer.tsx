@@ -1,8 +1,8 @@
 import React from "react";
-import { Vehicle } from "../store/vehicleStore";
+import { VehicleGeoJson } from "../store/vehicleStore";
 
 interface VehicleDetailDrawerProps {
-  vehicle?: Vehicle;
+  vehicle?: VehicleGeoJson["features"][0];
   open: boolean;
   onClose: () => void;
 }
@@ -13,9 +13,9 @@ export const VehicleDetailDrawer: React.FC<VehicleDetailDrawerProps> = ({
   onClose,
 }) => {
   if (!vehicle) return null;
+  const v = vehicle.properties;
   return (
     <>
-      {/* 오버레이 */}
       <div
         className={`fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity duration-300 ${
           open
@@ -24,7 +24,6 @@ export const VehicleDetailDrawer: React.FC<VehicleDetailDrawerProps> = ({
         }`}
         onClick={onClose}
       />
-      {/* 드로어 */}
       <aside
         className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-lg z-50 transform transition-transform duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
@@ -45,15 +44,13 @@ export const VehicleDetailDrawer: React.FC<VehicleDetailDrawerProps> = ({
             <label className="block text-sm font-medium text-gray-700">
               차량명
             </label>
-            <p className="mt-1 text-lg font-semibold">{vehicle.name}</p>
+            <p className="mt-1 text-lg font-semibold">{v.name}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               타입
             </label>
-            <p className="mt-1 text-lg font-semibold capitalize">
-              {vehicle.type}
-            </p>
+            <p className="mt-1 text-lg font-semibold capitalize">{v.type}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -61,37 +58,39 @@ export const VehicleDetailDrawer: React.FC<VehicleDetailDrawerProps> = ({
             </label>
             <span
               className={`mt-1 inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
-                vehicle.status === "활성"
+                v.status === "활성"
                   ? "bg-green-100 text-green-800"
-                  : vehicle.status === "대기"
+                  : v.status === "대기"
                   ? "bg-yellow-100 text-yellow-800"
                   : "bg-red-100 text-red-800"
               }`}
             >
-              {vehicle.status}
+              {v.status}
             </span>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               속도
             </label>
-            <p className="mt-1 text-lg font-semibold">{vehicle.speed} km/h</p>
+            <p className="mt-1 text-lg font-semibold">{v.speed} km/h</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               위치
             </label>
             <p className="mt-1 text-base">
-              위도: {vehicle.position.lat.toFixed(6)}
+              위도: {vehicle.geometry.coordinates[1].toFixed(6)}
             </p>
-            <p className="text-base">경도: {vehicle.position.lng.toFixed(6)}</p>
+            <p className="text-base">
+              경도: {vehicle.geometry.coordinates[0].toFixed(6)}
+            </p>
           </div>
-          {vehicle.route && (
+          {v.route && (
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 경로
               </label>
-              <p className="mt-1 text-lg font-semibold">{vehicle.route}</p>
+              <p className="mt-1 text-lg font-semibold">{v.route}</p>
             </div>
           )}
           <div>
@@ -99,17 +98,16 @@ export const VehicleDetailDrawer: React.FC<VehicleDetailDrawerProps> = ({
               마지막 업데이트
             </label>
             <p className="mt-1 text-sm text-gray-600">
-              {new Date(vehicle.lastUpdate).toLocaleString()}
+              {new Date(v.lastUpdate).toLocaleString()}
             </p>
           </div>
-          {/* 이동 이력 */}
-          {vehicle.history && vehicle.history.length > 1 && (
+          {v.history && v.history.length > 1 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 최근 이동 이력
               </label>
               <ol className="text-xs text-gray-500 space-y-1 max-h-32 overflow-y-auto list-decimal list-inside">
-                {vehicle.history
+                {v.history
                   .slice(-10)
                   .reverse()
                   .map((h, idx) => (

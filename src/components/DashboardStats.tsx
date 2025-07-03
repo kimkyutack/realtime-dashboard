@@ -1,5 +1,5 @@
 import React from "react";
-import { Vehicle } from "../store/vehicleStore";
+import { VehicleGeoJson } from "../store/vehicleStore";
 import {
   BarChart,
   Bar,
@@ -14,15 +14,15 @@ import {
 } from "recharts";
 
 interface DashboardStatsProps {
-  vehicles: Vehicle[];
+  vehicles: VehicleGeoJson["features"];
 }
 
 export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
-  const activeVehicles = vehicles.filter((v) => v.status === "활성");
+  const activeVehicles = vehicles.filter((f) => f.properties.status === "활성");
   const avgSpeed =
     activeVehicles.length > 0
       ? Math.round(
-          activeVehicles.reduce((sum, v) => sum + v.speed, 0) /
+          activeVehicles.reduce((sum, f) => sum + f.properties.speed, 0) /
             activeVehicles.length
         )
       : 0;
@@ -51,7 +51,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
           <div className="ml-4">
             <p className="text-sm font-medium text-gray-600">활성 차량</p>
             <p className="text-2xl font-bold text-gray-900">
-              {vehicles.filter((v) => v.status === "활성").length}대
+              {vehicles.filter((f) => f.properties.status === "활성").length}대
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
           <div className="ml-4">
             <p className="text-sm font-medium text-gray-600">정비 중</p>
             <p className="text-2xl font-bold text-gray-900">
-              {vehicles.filter((v) => v.status === "정비").length}대
+              {vehicles.filter((f) => f.properties.status === "정비").length}대
             </p>
           </div>
         </div>
@@ -87,13 +87,15 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
 };
 
 export const VehicleCharts: React.FC<DashboardStatsProps> = ({ vehicles }) => {
-  const typeStats = vehicles.reduce((acc, vehicle) => {
-    acc[vehicle.type] = (acc[vehicle.type] || 0) + 1;
+  const typeStats = vehicles.reduce((acc, feature) => {
+    const v = feature.properties;
+    acc[v.type] = (acc[v.type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  const statusStats = vehicles.reduce((acc, vehicle) => {
-    acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
+  const statusStats = vehicles.reduce((acc, feature) => {
+    const v = feature.properties;
+    acc[v.status] = (acc[v.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 

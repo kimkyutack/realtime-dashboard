@@ -77,7 +77,8 @@ export const Dashboard: React.FC = () => {
   const [filter, setFilter] = useState("");
   const {
     vehicles,
-    selectedVehicle,
+    selectedVehicleId,
+    getVehicleById,
     selectVehicle,
     isLoading,
     error,
@@ -86,6 +87,9 @@ export const Dashboard: React.FC = () => {
     isAdmin,
     toggleAdmin,
   } = useVehicleStore();
+  const selectedVehicle = selectedVehicleId
+    ? getVehicleById(selectedVehicleId)
+    : undefined;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -144,9 +148,9 @@ export const Dashboard: React.FC = () => {
           </div>
         )}
 
-        <DashboardStats vehicles={vehicles} />
+        <DashboardStats vehicles={vehicles.features} />
 
-        <VehicleCharts vehicles={vehicles} />
+        <VehicleCharts vehicles={vehicles.features} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -155,18 +159,14 @@ export const Dashboard: React.FC = () => {
                 차량 위치 지도
               </h2>
               <div className="h-[486px]">
-                <VehicleMap
-                  vehicles={vehicles}
-                  selectedVehicle={selectedVehicle}
-                  onVehicleSelect={handleVehicleSelect}
-                />
+                <VehicleMap />
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-1">
             <VehicleList
-              vehicles={vehicles}
+              vehicles={vehicles.features}
               selectedVehicle={selectedVehicle}
               onVehicleSelect={handleVehicleSelect}
               onFilterChange={handleFilterChange}
@@ -176,7 +176,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <VehicleDetailDrawer
-          vehicle={selectedVehicle || undefined}
+          vehicle={selectedVehicle}
           open={!!selectedVehicle && drawerOpen}
           onClose={() => setDrawerOpen(false)}
         />
@@ -185,7 +185,7 @@ export const Dashboard: React.FC = () => {
           <button
             className="fixed right-4 bottom-28 z-50 bg-red-600 text-white px-6 py-2 rounded shadow-lg hover:bg-red-700"
             onClick={() => {
-              removeVehicle(selectedVehicle.id);
+              removeVehicle(selectedVehicle.properties.id);
               setDrawerOpen(false);
             }}
           >
