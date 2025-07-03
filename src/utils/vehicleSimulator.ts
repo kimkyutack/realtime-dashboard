@@ -16,16 +16,16 @@ const koreanCities = [
 
 // 차량 타입별 기본 속도
 const vehicleSpeeds = {
-  truck: { min: 30, max: 80 },
-  bus: { min: 20, max: 60 },
-  car: { min: 0, max: 100 },
+  트럭: { min: 30, max: 80 },
+  버스: { min: 20, max: 60 },
+  승용차: { min: 0, max: 100 },
 };
 
 // 차량 상태별 확률
 const statusProbabilities = {
-  active: 0.7,
-  idle: 0.2,
-  maintenance: 0.1,
+  활성: 0.7,
+  대기: 0.2,
+  정비: 0.1,
 };
 
 export class VehicleSimulator {
@@ -57,7 +57,8 @@ export class VehicleSimulator {
 
   // 차량 속도를 랜덤하게 변경
   private updateVehicleSpeed(vehicle: Vehicle): Vehicle {
-    const speedRange = vehicleSpeeds[vehicle.type];
+    const speedRange =
+      vehicleSpeeds[vehicle.type as keyof typeof vehicleSpeeds];
     const currentSpeed = vehicle.speed;
     const speedChange = (Math.random() - 0.5) * 10; // ±5 km/h 변화
 
@@ -94,7 +95,7 @@ export class VehicleSimulator {
     let updatedVehicle = vehicle;
 
     // 활성 상태인 차량만 이동
-    if (vehicle.status === "active") {
+    if (vehicle.status === "활성") {
       updatedVehicle = this.moveVehicle(updatedVehicle);
     }
 
@@ -163,17 +164,17 @@ export class VehicleSimulator {
 // 더미 차량 데이터 생성
 export function generateDummyVehicles(count: number = 10): Vehicle[] {
   const vehicles: Vehicle[] = [];
-  const types: Vehicle["type"][] = ["truck", "bus", "car"];
+  const types: Vehicle["type"][] = ["트럭", "버스", "승용차"];
 
   for (let i = 1; i <= count; i++) {
     const type = types[Math.floor(Math.random() * types.length)];
     const city = koreanCities[Math.floor(Math.random() * koreanCities.length)];
-    const speedRange = vehicleSpeeds[type];
+    const speedRange = vehicleSpeeds[type as keyof typeof vehicleSpeeds];
 
     const vehicle: Vehicle = {
       id: i.toString(),
       name: `${
-        type === "truck" ? "트럭" : type === "bus" ? "버스" : "승용차"
+        type === "트럭" ? "트럭" : type === "버스" ? "버스" : "승용차"
       }-${String(i).padStart(3, "0")}`,
       type,
       position: {
@@ -181,11 +182,11 @@ export function generateDummyVehicles(count: number = 10): Vehicle[] {
         lng: city.lng + (Math.random() - 0.5) * 0.1,
       },
       status:
-        Math.random() < statusProbabilities.active
-          ? "active"
-          : Math.random() < statusProbabilities.idle
-          ? "idle"
-          : "maintenance",
+        Math.random() < statusProbabilities.활성
+          ? "활성"
+          : Math.random() < statusProbabilities.대기
+          ? "대기"
+          : "정비",
       speed:
         Math.floor(Math.random() * (speedRange.max - speedRange.min)) +
         speedRange.min,

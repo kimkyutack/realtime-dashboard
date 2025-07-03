@@ -42,9 +42,6 @@ export const Dashboard: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 실시간 차량 위치 대시보드
               </h1>
-              <p className="text-sm text-gray-600">
-                GeoJSON 데이터 기반 실시간 모니터링
-              </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -77,7 +74,7 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
                 차량 위치 지도
               </h2>
-              <div className="h-96">
+              <div className="h-[486px]">
                 <VehicleMap
                   vehicles={vehicles}
                   selectedVehicle={selectedVehicle}
@@ -136,16 +133,16 @@ export const Dashboard: React.FC = () => {
                   </label>
                   <span
                     className={`mt-1 inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
-                      selectedVehicle.status === "active"
+                      selectedVehicle.status === "활성"
                         ? "bg-green-100 text-green-800"
-                        : selectedVehicle.status === "idle"
+                        : selectedVehicle.status === "대기"
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {selectedVehicle.status === "active"
+                    {selectedVehicle.status === "활성"
                       ? "활성"
-                      : selectedVehicle.status === "idle"
+                      : selectedVehicle.status === "대기"
                       ? "대기"
                       : "정비"}
                   </span>

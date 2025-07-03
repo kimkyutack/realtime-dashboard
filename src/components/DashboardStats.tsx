@@ -18,7 +18,7 @@ interface DashboardStatsProps {
 }
 
 export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
-  const activeVehicles = vehicles.filter((v) => v.status === "active");
+  const activeVehicles = vehicles.filter((v) => v.status === "활성");
   const avgSpeed =
     activeVehicles.length > 0
       ? Math.round(
@@ -31,7 +31,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center">
-          <div className="p-3 rounded-full bg-blue-100">
+          <div className="p-3 px-4 rounded-full bg-blue-100">
             <span className="text-2xl">🚗</span>
           </div>
           <div className="ml-4">
@@ -45,13 +45,13 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center">
-          <div className="p-3 rounded-full bg-green-100">
+          <div className="p-3 px-4 rounded-full bg-green-100">
             <span className="text-2xl">✅</span>
           </div>
           <div className="ml-4">
             <p className="text-sm font-medium text-gray-600">활성 차량</p>
             <p className="text-2xl font-bold text-gray-900">
-              {vehicles.filter((v) => v.status === "active").length}대
+              {vehicles.filter((v) => v.status === "활성").length}대
             </p>
           </div>
         </div>
@@ -59,7 +59,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center">
-          <div className="p-3 rounded-full bg-yellow-100">
+          <div className="p-3 px-4 rounded-full bg-yellow-100">
             <span className="text-2xl">⚡</span>
           </div>
           <div className="ml-4">
@@ -71,13 +71,13 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ vehicles }) => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center">
-          <div className="p-3 rounded-full bg-red-100">
+          <div className="p-3 px-4 rounded-full bg-red-100">
             <span className="text-2xl">🔧</span>
           </div>
           <div className="ml-4">
             <p className="text-sm font-medium text-gray-600">정비 중</p>
             <p className="text-2xl font-bold text-gray-900">
-              {vehicles.filter((v) => v.status === "maintenance").length}대
+              {vehicles.filter((v) => v.status === "정비").length}대
             </p>
           </div>
         </div>
@@ -98,20 +98,20 @@ export const VehicleCharts: React.FC<DashboardStatsProps> = ({ vehicles }) => {
   }, {} as Record<string, number>);
 
   const typeChartData = Object.entries(typeStats).map(([type, count]) => ({
-    name: type === "truck" ? "트럭" : type === "bus" ? "버스" : "승용차",
+    name: type === "트럭" ? "트럭" : type === "버스" ? "버스" : "승용차",
     value: count,
     color:
-      type === "truck" ? "#3B82F6" : type === "bus" ? "#10B981" : "#F59E0B",
+      type === "트럭" ? "#3B82F6" : type === "버스" ? "#10B981" : "#F59E0B",
   }));
 
   const statusChartData = Object.entries(statusStats).map(
     ([status, count]) => ({
-      name: status === "active" ? "활성" : status === "idle" ? "대기" : "정비",
+      name: status === "활성" ? "활성" : status === "대기" ? "대기" : "정비",
       value: count,
       color:
-        status === "active"
+        status === "활성"
           ? "#10B981"
-          : status === "idle"
+          : status === "대기"
           ? "#F59E0B"
           : "#EF4444",
     })

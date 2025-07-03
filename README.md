@@ -111,12 +111,12 @@ simulator.start((vehicle: Vehicle) => {
 interface Vehicle {
   id: string;
   name: string;
-  type: "truck" | "bus" | "car";
+  type: "트럭" | "버스" | "승용차";
   position: {
     lat: number;
     lng: number;
   };
-  status: "active" | "idle" | "maintenance";
+  status: "활성" | "대기" | "정비";
   speed: number;
   lastUpdate: string;
   route?: string;
@@ -151,20 +151,8 @@ ws.onmessage = (event) => {
 };
 ```
 
-## 🚀 배포
-
-### Netlify 배포
-
 ```bash
 npm run build
-# build 폴더를 Netlify에 업로드
-```
-
-### Vercel 배포
-
-```bash
-npm install -g vercel
-vercel
 ```
 
 ## 🤝 기여하기
@@ -174,11 +162,3 @@ vercel
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📝 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.
-
-## 📞 문의
-
-프로젝트에 대한 문의사항이 있으시면 이슈를 생성해 주세요.

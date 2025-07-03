@@ -11,11 +11,11 @@ interface VehicleListProps {
 
 const getStatusColor = (status: Vehicle["status"]) => {
   switch (status) {
-    case "active":
+    case "활성":
       return "bg-green-100 text-green-800";
-    case "idle":
+    case "대기":
       return "bg-yellow-100 text-yellow-800";
-    case "maintenance":
+    case "정비":
       return "bg-red-100 text-red-800";
     default:
       return "bg-gray-100 text-gray-800";
@@ -24,11 +24,11 @@ const getStatusColor = (status: Vehicle["status"]) => {
 
 const getTypeIcon = (type: Vehicle["type"]) => {
   switch (type) {
-    case "truck":
+    case "트럭":
       return "🚛";
-    case "bus":
+    case "버스":
       return "🚌";
-    case "car":
+    case "승용차":
       return "🚗";
     default:
       return "🚗";
@@ -122,7 +122,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
         <div className="flex justify-between text-sm text-gray-600">
           <span>총 차량: {vehicles.length}대</span>
           <span>
-            활성: {vehicles.filter((v) => v.status === "active").length}대
+            활성: {vehicles.filter((v) => v.status === "활성").length}대
           </span>
         </div>
       </div>

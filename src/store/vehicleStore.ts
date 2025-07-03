@@ -3,12 +3,12 @@ import { create } from "zustand";
 export interface Vehicle {
   id: string;
   name: string;
-  type: "truck" | "car" | "bus";
+  type: "트럭" | "승용차" | "버스";
   position: {
     lat: number;
     lng: number;
   };
-  status: "active" | "idle" | "maintenance";
+  status: "활성" | "대기" | "정비";
   speed: number;
   lastUpdate: string;
   route?: string;
@@ -52,7 +52,7 @@ export const useVehicleStore = create<VehicleStore>((set, get) => ({
 
   setError: (error) => set({ error }),
 
-  getActiveVehicles: () => get().vehicles.filter((v) => v.status === "active"),
+  getActiveVehicles: () => get().vehicles.filter((v) => v.status === "활성"),
 
   getVehicleById: (id) => get().vehicles.find((v) => v.id === id),
 

@@ -13,26 +13,19 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-const vehicleIcons = {
-  truck: L.divIcon({
+function getVehicleIcon(type: Vehicle["type"]) {
+  return L.divIcon({
     className: "custom-div-icon",
-    html: `<div style="background-color: #3B82F6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🚛</div>`,
+    html:
+      type === "트럭"
+        ? `<div style="background-color: #3B82F6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🚛</div>`
+        : type === "버스"
+        ? `<div style="background-color: #10B981; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🚌</div>`
+        : `<div style="background-color: #F59E0B; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🚗</div>`,
     iconSize: [20, 20],
     iconAnchor: [10, 10],
-  }),
-  bus: L.divIcon({
-    className: "custom-div-icon",
-    html: `<div style="background-color: #10B981; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🚌</div>`,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-  }),
-  car: L.divIcon({
-    className: "custom-div-icon",
-    html: `<div style="background-color: #F59E0B; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">🚗</div>`,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-  }),
-};
+  });
+}
 
 interface VehicleMapProps {
   vehicles: Vehicle[];
@@ -90,7 +83,7 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
           <Marker
             key={vehicle.id}
             position={[vehicle.position.lat, vehicle.position.lng]}
-            icon={vehicleIcons[vehicle.type]}
+            icon={getVehicleIcon(vehicle.type)}
             eventHandlers={{
               click: () => onVehicleSelect(vehicle),
             }}
