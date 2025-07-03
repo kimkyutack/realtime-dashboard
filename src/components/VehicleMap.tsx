@@ -1,6 +1,25 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useVehicleStore } from "../store/vehicleStore";
 import L from "leaflet";
+import { useMap } from "react-leaflet";
+import { useEffect } from "react";
+
+function MapFlyToSelected() {
+  const { selectedVehicleId, getVehicleById } = useVehicleStore();
+  const map = useMap();
+  const selected = selectedVehicleId
+    ? getVehicleById(selectedVehicleId)
+    : undefined;
+
+  useEffect(() => {
+    if (selected) {
+      const [lng, lat] = selected.geometry.coordinates;
+      map.setView([lat, lng], 15, { animate: true });
+    }
+  }, [selected, map]);
+
+  return null;
+}
 
 export const VehicleMap = () => {
   const { vehicles, selectVehicle } = useVehicleStore();
@@ -22,6 +41,7 @@ export const VehicleMap = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapFlyToSelected />
         {vehicles.features.map((feature) => (
           <Marker
             key={feature.properties.id}

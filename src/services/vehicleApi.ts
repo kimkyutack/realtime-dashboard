@@ -1,12 +1,10 @@
 import axios from "axios";
 import { Vehicle, VehicleGeoJson } from "../store/vehicleStore";
-import { generateDummyVehicles } from "../utils/vehicleSimulator";
 
 const API_BASE_URL = "https://api.example.com";
 
 export const vehicleApi = {
   getVehicles: async (): Promise<VehicleGeoJson> => {
-    // 실제 API라면 fetch/axios로 GeoJSON을 받아오면 됨
     return getMockVehicles();
   },
 

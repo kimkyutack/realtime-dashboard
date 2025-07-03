@@ -97,8 +97,8 @@ export const Dashboard: React.FC = () => {
 
   useVehicleUpdates();
 
-  const handleVehicleSelect = (vehicle: any) => {
-    selectVehicle(vehicle);
+  const handleVehicleSelect = (feature: any) => {
+    selectVehicle(feature.properties.id);
     setDrawerOpen(true);
   };
 
