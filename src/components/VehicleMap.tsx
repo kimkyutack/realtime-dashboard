@@ -1,5 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  Polyline,
+} from "react-leaflet";
 import L from "leaflet";
 import { Vehicle } from "../store/vehicleStore";
 
@@ -80,32 +87,53 @@ export const VehicleMap: React.FC<VehicleMapProps> = ({
         <MapUpdater vehicles={vehicles} />
 
         {vehicles.map((vehicle) => (
-          <Marker
-            key={vehicle.id}
-            position={[vehicle.position.lat, vehicle.position.lng]}
-            icon={getVehicleIcon(vehicle.type)}
-            eventHandlers={{
-              click: () => onVehicleSelect(vehicle),
-            }}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-bold text-lg">{vehicle.name}</h3>
-                <p className="text-sm text-gray-600">타입: {vehicle.type}</p>
-                <p className="text-sm text-gray-600">상태: {vehicle.status}</p>
-                <p className="text-sm text-gray-600">
-                  속도: {vehicle.speed} km/h
-                </p>
-                {vehicle.route && (
-                  <p className="text-sm text-gray-600">경로: {vehicle.route}</p>
-                )}
-                <p className="text-xs text-gray-500">
-                  마지막 업데이트:{" "}
-                  {new Date(vehicle.lastUpdate).toLocaleString()}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
+          <React.Fragment key={vehicle.id}>
+            {/* 차량 이동 경로 Polyline */}
+            {vehicle.history && vehicle.history.length > 1 && (
+              <Polyline
+                positions={vehicle.history.map((h) => [h.lat, h.lng])}
+                pathOptions={{
+                  color:
+                    vehicle.type === "트럭"
+                      ? "#3B82F6"
+                      : vehicle.type === "버스"
+                      ? "#10B981"
+                      : "#F59E0B",
+                  weight: 3,
+                  opacity: 0.7,
+                }}
+              />
+            )}
+            <Marker
+              position={[vehicle.position.lat, vehicle.position.lng]}
+              icon={getVehicleIcon(vehicle.type)}
+              eventHandlers={{
+                click: () => onVehicleSelect(vehicle),
+              }}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold text-lg">{vehicle.name}</h3>
+                  <p className="text-sm text-gray-600">타입: {vehicle.type}</p>
+                  <p className="text-sm text-gray-600">
+                    상태: {vehicle.status}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    속도: {vehicle.speed} km/h
+                  </p>
+                  {vehicle.route && (
+                    <p className="text-sm text-gray-600">
+                      경로: {vehicle.route}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    마지막 업데이트:{" "}
+                    {new Date(vehicle.lastUpdate).toLocaleString()}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          </React.Fragment>
         ))}
       </MapContainer>
     </div>

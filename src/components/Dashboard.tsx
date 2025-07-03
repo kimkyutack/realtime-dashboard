@@ -4,11 +4,90 @@ import { VehicleList } from "./VehicleList";
 import { DashboardStats, VehicleCharts } from "./DashboardStats";
 import { useVehicleStore } from "../store/vehicleStore";
 import { useVehicles, useVehicleUpdates } from "../hooks/useVehicles";
+import { VehicleDetailDrawer } from "./VehicleDetailDrawer";
+
+function AddVehicleForm({
+  open,
+  onClose,
+  onAdd,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onAdd: (v: any) => void;
+}) {
+  const [name, setName] = useState("");
+  const [type, setType] = useState("트럭");
+  const [route, setRoute] = useState("");
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-30">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm z-[10000]">
+        <h2 className="text-lg font-bold mb-4">차량 추가</h2>
+        <input
+          className="w-full mb-2 border p-2 rounded"
+          placeholder="차량명"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <select
+          className="w-full mb-2 border p-2 rounded"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
+          <option value="트럭">트럭</option>
+          <option value="버스">버스</option>
+          <option value="승용차">승용차</option>
+        </select>
+        <input
+          className="w-full mb-2 border p-2 rounded"
+          placeholder="경로(선택)"
+          value={route}
+          onChange={(e) => setRoute(e.target.value)}
+        />
+        <div className="flex justify-end space-x-2 mt-4">
+          <button className="px-4 py-2 bg-gray-200 rounded" onClick={onClose}>
+            취소
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+            onClick={() => {
+              onAdd({
+                id: Date.now().toString(),
+                name,
+                type,
+                position: { lat: 37.5665, lng: 126.978 },
+                status: "활성",
+                speed: 0,
+                lastUpdate: new Date().toISOString(),
+                route,
+                history: [],
+              });
+              onClose();
+            }}
+          >
+            추가
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const Dashboard: React.FC = () => {
   const [filter, setFilter] = useState("");
-  const { vehicles, selectedVehicle, selectVehicle, isLoading, error } =
-    useVehicleStore();
+  const {
+    vehicles,
+    selectedVehicle,
+    selectVehicle,
+    isLoading,
+    error,
+    addVehicle,
+    removeVehicle,
+    isAdmin,
+    toggleAdmin,
+  } = useVehicleStore();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useVehicles();
 
@@ -16,6 +95,7 @@ export const Dashboard: React.FC = () => {
 
   const handleVehicleSelect = (vehicle: any) => {
     selectVehicle(vehicle);
+    setDrawerOpen(true);
   };
 
   const handleFilterChange = (newFilter: string) => {
@@ -95,105 +175,55 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {selectedVehicle && (
-          <div className="mt-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-800">
-                  선택된 차량 상세 정보
-                </h2>
-                <button
-                  onClick={() => selectVehicle(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ✕
-                </button>
-              </div>
+        <VehicleDetailDrawer
+          vehicle={selectedVehicle || undefined}
+          open={!!selectedVehicle && drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    차량명
-                  </label>
-                  <p className="mt-1 text-lg font-semibold">
-                    {selectedVehicle.name}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    타입
-                  </label>
-                  <p className="mt-1 text-lg font-semibold capitalize">
-                    {selectedVehicle.type}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    상태
-                  </label>
-                  <span
-                    className={`mt-1 inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
-                      selectedVehicle.status === "활성"
-                        ? "bg-green-100 text-green-800"
-                        : selectedVehicle.status === "대기"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {selectedVehicle.status === "활성"
-                      ? "활성"
-                      : selectedVehicle.status === "대기"
-                      ? "대기"
-                      : "정비"}
-                  </span>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    속도
-                  </label>
-                  <p className="mt-1 text-lg font-semibold">
-                    {selectedVehicle.speed} km/h
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    위도
-                  </label>
-                  <p className="mt-1 text-lg font-semibold">
-                    {selectedVehicle.position.lat.toFixed(6)}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    경도
-                  </label>
-                  <p className="mt-1 text-lg font-semibold">
-                    {selectedVehicle.position.lng.toFixed(6)}
-                  </p>
-                </div>
-                {selectedVehicle.route && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      경로
-                    </label>
-                    <p className="mt-1 text-lg font-semibold">
-                      {selectedVehicle.route}
-                    </p>
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    마지막 업데이트
-                  </label>
-                  <p className="mt-1 text-sm text-gray-600">
-                    {new Date(selectedVehicle.lastUpdate).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+        {isAdmin && selectedVehicle && drawerOpen && (
+          <button
+            className="fixed right-4 bottom-28 z-50 bg-red-600 text-white px-6 py-2 rounded shadow-lg hover:bg-red-700"
+            onClick={() => {
+              removeVehicle(selectedVehicle.id);
+              setDrawerOpen(false);
+            }}
+          >
+            차량 삭제
+          </button>
         )}
       </div>
+
+      <div className="fixed top-4 right-4 z-50 flex items-center space-x-2">
+        <span className="text-sm">관리자 모드</span>
+        <button
+          onClick={toggleAdmin}
+          className={`w-10 h-6 rounded-full ${
+            isAdmin ? "bg-blue-600" : "bg-gray-300"
+          } relative focus:outline-none`}
+        >
+          <span
+            className={`block w-5 h-5 bg-white rounded-full shadow absolute top-0.5 transition-transform ${
+              isAdmin ? "translate-x-4" : "translate-x-0"
+            }`}
+          ></span>
+        </button>
+      </div>
+
+      {isAdmin && (
+        <button
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center text-3xl shadow-lg hover:bg-blue-700"
+          onClick={() => setShowAddForm(true)}
+        >
+          +
+        </button>
+      )}
+
+      <AddVehicleForm
+        open={showAddForm}
+        onClose={() => setShowAddForm(false)}
+        onAdd={addVehicle}
+      />
     </div>
   );
 };
