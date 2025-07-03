@@ -98,7 +98,7 @@ export const VehicleCharts: React.FC<DashboardStatsProps> = ({ vehicles }) => {
   }, {} as Record<string, number>);
 
   const typeChartData = Object.entries(typeStats).map(([type, count]) => ({
-    name: type === "트럭" ? "트럭" : type === "버스" ? "버스" : "승용차",
+    name: type,
     value: count,
     color:
       type === "트럭" ? "#3B82F6" : type === "버스" ? "#10B981" : "#F59E0B",
@@ -106,7 +106,7 @@ export const VehicleCharts: React.FC<DashboardStatsProps> = ({ vehicles }) => {
 
   const statusChartData = Object.entries(statusStats).map(
     ([status, count]) => ({
-      name: status === "활성" ? "활성" : status === "대기" ? "대기" : "정비",
+      name: status,
       value: count,
       color:
         status === "활성"
